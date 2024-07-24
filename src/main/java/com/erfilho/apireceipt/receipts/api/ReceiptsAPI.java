@@ -3,9 +3,11 @@ package com.erfilho.apireceipt.receipts.api;
 import com.erfilho.apireceipt.receipts.dto.ReceiptDTO;
 import com.erfilho.apireceipt.receipts.facade.ReceiptFacade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ public class ReceiptsAPI {
 
     @PostMapping
     @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
     public ReceiptDTO criar(@RequestBody ReceiptDTO receiptDTO){
         return receiptFacade.criar(receiptDTO);
     }
@@ -26,6 +29,17 @@ public class ReceiptsAPI {
     public ReceiptDTO atualizar(@PathVariable("receiptId") Long receiptId,
                                 @RequestBody ReceiptDTO receiptDTO){
         return receiptFacade.atualizar(receiptDTO, receiptId);
+    }
+
+    @GetMapping("/{receiptId}")
+    @ResponseBody
+    public ReceiptDTO getOne(@PathVariable("receiptId") Long receiptId){
+        ReceiptDTO receipt = receiptFacade.getById(receiptId);
+        if(receipt == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found referred receipt Id");
+        } else {
+            return receipt;
+        }
     }
 
     @GetMapping
